@@ -24,53 +24,59 @@ namespace RefactorCh1
         }
 
         public String statement()
-        {
-            double totalAmount = 0;
-            int frequentRenterPoints = 0;
+        {          
+            
             IEnumerable<Rental> rentals = _rentals.ToArray();
             String result = "Rental Record for " + getName() + "\n";
 
-            foreach (Rental each in _rentals)
+            foreach (Rental rental in _rentals)
             {
-                double thisAmount = 0;
                 //determine amounts for each line
-                switch (each.getMovie().getPriceCode())
-                {
-                    case Movie.REGULAR:
-                        thisAmount += 2;
-                        if (each.getDaysRented() > 2)
-                        {
-                            thisAmount += (each.getDaysRented() - 2) * 1.5;
-                        }
-                        break;
+                double thisAmount = rental.GetCharge();                                               
 
-                    case Movie.NEW_RELEASE:
-                        thisAmount += each.getDaysRented() * 3;
-                        break;
-
-                    case Movie.CHILDRENS:
-                        thisAmount += 1.5;
-                        if (each.getDaysRented() > 3)
-                        {
-                            thisAmount += (each.getDaysRented() - 3) * 1.5;
-                        }
-                        break;
-                }
-
-                // add frequent renter points
-                frequentRenterPoints++;
-                // add bonus for a two day new release rental
-                if ((each.getMovie().getPriceCode() == Movie.NEW_RELEASE) && each.getDaysRented() > 1)
-                    frequentRenterPoints++;
                 //show figures for this rental
-                result += "\t" + each.getMovie().getTitle() + "\t" + (thisAmount.ToString()) + "\n";
-                totalAmount += thisAmount;
+                result += "\t" + rental.getMovie().getTitle() + "\t" + (thisAmount.ToString()) + "\n";                
             }
 
             //add footer lines
-            result += "Amount owed is " + totalAmount.ToString() + "\n";
-            result += "You earned " + frequentRenterPoints.ToString() + " frequent renter points";
+            result += "Amount owed is " + GetTotalCharge().ToString() + "\n";
+            result += "You earned " + getTotalFrequentRenterPoints().ToString() + " frequent renter points";
             return result;
+        }
+
+        private double getTotalFrequentRenterPoints()
+        {
+            int frequentRenterPoints = 0;
+
+            foreach (Rental rental in _rentals)
+            {
+                frequentRenterPoints += rental.AddFrequentRenterPoints();
+            }
+
+            return frequentRenterPoints;
+        }
+
+        private double GetTotalCharge()
+        {
+            double totalAmount = 0;
+
+            foreach (Rental rental in _rentals)
+            {
+                double thisAmount = getCharge(rental);
+                totalAmount += thisAmount;
+            }
+
+            return totalAmount;
+        }
+
+        private double getCharge(Rental rental)
+        {
+            return rental.GetCharge();
         }
     }
 }
+
+// extract and break down complicated bits.
+// rename variables to proper ones
+// ask whether it actually belongs there? If not, extract and put it in the relevant class
+// get rid of any temporary variables and replace them with queries - yes there is performance but it helps improve the code

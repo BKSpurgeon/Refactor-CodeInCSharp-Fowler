@@ -20,5 +20,16 @@
         {
             return _movie;
         }
+
+        public double GetCharge()
+        {
+            return _movie.GetCharge(_daysRented);
+        }
+
+
+        public int AddFrequentRenterPoints()
+        {
+            return getMovie().AddFrequentRenterPoints(_daysRented);           
+        }
     }
 }
